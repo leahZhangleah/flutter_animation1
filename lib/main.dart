@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animation/circle_progress_bar.dart';
+import 'package:flutter_animation/long_press_bloc.dart';
 import 'capture_button.dart';
+import 'package:flutter_animation/long_press_event_counter.dart';
 
 void main() => runApp(MyApp());
 
@@ -46,56 +50,58 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Size containerSize,bigButtonSize,smallButtonSize;
+  final _bloc = LongPressBloc();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    containerSize = Size(100, 100);
-    bigButtonSize = Size(70,70);
-    smallButtonSize = Size(40, 40);
   }
 
   @override
   Widget build(BuildContext context) {
+    //List<Size> sizes = [Size(70,70),Size(50,50)];
+
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
-    //
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
       body: Center(
         child: GestureDetector(
-          onLongPress: (){
-            setState(() {
-              bigButtonSize = containerSize;
-              smallButtonSize = Size(30, 30);
-            });
-          },
-          onTapUp: (tapUpDetails){
-            setState(() {
-              bigButtonSize = Size(70,70);
-              smallButtonSize = Size(40, 40);
-            });
-          },
-          child: Container(
-            width: containerSize.width,
-            height: containerSize.height,
-            child: new Stack(
-              children: <Widget>[
-                Center(
-                  child:CaptureButton(size: Size(bigButtonSize.width, bigButtonSize.height),color: Colors.yellow,),
-                ),
-                Center(
-                  child: CaptureButton(size: Size(smallButtonSize.width, smallButtonSize.height),color: Colors.black),
-                )
-              ],
-            ),
-          ),
+          onLongPress: ()=> _bloc.counterEventSink.add(LongPressStartEvent()),
+          onLongPressUp: ()=>_bloc.counterEventSink.add(LongPressEndEvent()),
+          child: StreamBuilder(
+            stream: _bloc.sizes,
+              //initialData: sizes,
+              builder: (context,snapshot){
+              return new Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  CaptureButton(size: snapshot.data[0],color: Colors.yellow,),
+                  CaptureButton(size: snapshot.data[1],color: Colors.black,),
+                  CircleProgressBar(
+                      foregroundColor: Colors.green,
+                      value: 0.5,
+                      duration: Duration(seconds: 10),
+                      container: new Container(
+                        width: 100,
+                        height: 100,
+                      )
+                  ),
+                ],
+              );
+              }),
         ),
       )
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _bloc.dispose();
+    super.dispose();
   }
 
   /*
