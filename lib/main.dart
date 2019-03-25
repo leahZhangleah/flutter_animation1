@@ -71,27 +71,23 @@ class _MyHomePageState extends State<MyHomePage> {
         child: GestureDetector(
           onLongPress: ()=> _bloc.counterEventSink.add(LongPressStartEvent()),
           onLongPressUp: ()=>_bloc.counterEventSink.add(LongPressEndEvent()),
-          child: StreamBuilder(
-            stream: _bloc.sizes,
-              //initialData: sizes,
-              builder: (context,snapshot){
-              return new Stack(
-                alignment: Alignment.center,
-                children: <Widget>[
-                  CaptureButton(size: snapshot.data[0],color: Colors.yellow,),
-                  CaptureButton(size: snapshot.data[1],color: Colors.black,),
-                  CircleProgressBar(
-                      foregroundColor: Colors.green,
-                      value: 0.5,
-                      duration: Duration(seconds: 10),
-                      container: new Container(
-                        width: 100,
-                        height: 100,
-                      )
-                  ),
-                ],
-              );
-              }),
+          child: new Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              new StreamBuilder(
+                  stream: _bloc.bigBtnSize,
+                  initialData: Size(70,70),
+                  builder: (context,snapshot){
+                    return new CaptureButton(size: snapshot.data,color: Colors.yellow,);
+                  }),
+              new StreamBuilder(
+                  stream: _bloc.smallBtnSize,
+                  initialData: Size(50,50),
+                  builder: (context,snapshot){
+                    return new CaptureButton(size: snapshot.data,color: Colors.black,);
+                  }),
+            ],
+          ),
         ),
       )
     );

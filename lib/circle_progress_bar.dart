@@ -130,6 +130,7 @@ class CircleProgressBarPainter extends CustomPainter {
       canvas.drawCircle(center, radius, backgroundPaint);
     }
 
+    //progress arc
     canvas.drawArc(
         Rect.fromCircle(center: center,radius: radius),
         startAngle, sweepAngle, false, foregroundPaint);
