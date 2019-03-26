@@ -3,20 +3,24 @@ import 'long_press_event_counter.dart';
 import 'package:flutter/material.dart';
 
 class LongPressBloc{
-  Size _bigBtnSize,_smallBtnSize;
-  final _bigBtnStateController = StreamController<Size>();
-  final _smallBtnStateController = StreamController<Size>();
-  Timer totalTimer,passedTimer;
-  int timePassed;
-  Stopwatch stopwatch;
+  Tween<Size> _bigBtnSizeTween,_smallBtnSizeTween;
+  bool _showProgress;
+  final _bigBtnStateController = StreamController<Tween<Size>>();
+  final _smallBtnStateController = StreamController<Tween<Size>>();
+  final _showProgressController = StreamController<bool>();
+  Timer totalTimer;
 
-  StreamSink<Size> get _bigBtnSizeCounter => _bigBtnStateController.sink;
+  StreamSink<Tween<Size>> get _bigBtnSizeCounter => _bigBtnStateController.sink;
 
-  Stream<Size> get bigBtnSize => _bigBtnStateController.stream;
+  Stream<Tween<Size>> get bigBtnSizeTween => _bigBtnStateController.stream;
 
-  StreamSink<Size> get _smallBtnSizeCounter => _smallBtnStateController.sink;
+  StreamSink<Tween<Size>> get _smallBtnSizeCounter => _smallBtnStateController.sink;
 
-  Stream<Size> get smallBtnSize => _smallBtnStateController.stream;
+  Stream<Tween<Size>> get smallBtnSizeTween => _smallBtnStateController.stream;
+
+  StreamSink<bool> get _showProgressCounter => _showProgressController.sink;
+
+  Stream<bool> get showProgress => _showProgressController.stream;
 
   final _counterEventController = StreamController<CounterEvent>();
 
@@ -24,40 +28,34 @@ class LongPressBloc{
 
   LongPressBloc(){
     _counterEventController.stream.listen(_mapEventToState);
-    stopwatch = new Stopwatch();
   }
 
   void _mapEventToState(CounterEvent event) {
     if(event is LongPressStartEvent){
-      totalTimer = new Timer(new Duration(seconds:5), (){
+      totalTimer = new Timer(new Duration(seconds:10), (){
         counterEventSink.add(new LongPressEndEvent());
       });
-      stopwatch.start();
-      passedTimer = new Timer.periodic(new Duration(milliseconds: 500), (timer){
-        print(stopwatch.elapsedMilliseconds);
-      });
-      _bigBtnSize = Size(100,100);
-      _smallBtnSize = Size(40,40);
+      _bigBtnSizeTween = Tween(begin:Size(70,70),end: Size(100, 100));
+      _smallBtnSizeTween = Tween(begin:Size(50,50),end: Size(40, 40));
+      _showProgress = true;
     } else{
       if(totalTimer!=null){
         totalTimer.cancel();
         totalTimer = null;
       }
-      if(passedTimer!=null){
-        passedTimer.cancel();
-        passedTimer=null;
-      }
-      stopwatch..stop()..reset();
-      _bigBtnSize = Size(70,70);
-      _smallBtnSize = Size(50,50);
+      _bigBtnSizeTween = Tween(begin:Size(100, 100),end:Size(70,70));
+      _smallBtnSizeTween = Tween(begin:Size(40, 40),end:Size(50,50));
+      _showProgress = false;
     }
-    _bigBtnSizeCounter.add(_bigBtnSize);
-    _smallBtnSizeCounter.add(_smallBtnSize);
+    _bigBtnSizeCounter.add(_bigBtnSizeTween);
+    _smallBtnSizeCounter.add(_smallBtnSizeTween);
+    _showProgressCounter.add(_showProgress);
   }
 
   void dispose(){
     _counterEventController.close();
     _bigBtnStateController.close();
     _smallBtnStateController.close();
+    _showProgressController.close();
   }
 }

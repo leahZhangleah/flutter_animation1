@@ -60,7 +60,7 @@ class CircleProgressBarState extends State<CircleProgressBar> with SingleTickerP
               foregroundPainter: CircleProgressBarPainter(
                   percentage: valueTween.evaluate(_controller),
                   foregroundColor: foregroundColor,
-                  backgroundColor: backgroundColor)
+                  backgroundColor: backgroundColor,)
           );
         },
       ),
@@ -98,18 +98,20 @@ class CircleProgressBarState extends State<CircleProgressBar> with SingleTickerP
 class CircleProgressBarPainter extends CustomPainter {
   final double percentage, strokeWidth;
   final Color backgroundColor,foregroundColor;
+  //final Size containerSize;
 
   CircleProgressBarPainter({
     @required this.percentage,
     double strokeWidth,
     this.backgroundColor,
-    @required this.foregroundColor}
-      ):this.strokeWidth = strokeWidth?? 10;
+    @required this.foregroundColor,}
+      ):this.strokeWidth = strokeWidth?? 5;
 
   @override
   void paint(Canvas canvas, Size size) {
     final Offset center = size.center(Offset.zero);
-    final Size constrainedSize = size - Offset(this.strokeWidth, this.strokeWidth);
+
+    final Size constrainedSize = Size(100,100) - Offset(this.strokeWidth, this.strokeWidth);
     final shortestSide = min(constrainedSize.width, constrainedSize.height);
 
     final foregroundPaint = Paint()

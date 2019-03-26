@@ -67,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Center(
         child: GestureDetector(
           onLongPress: ()=> _bloc.counterEventSink.add(LongPressStartEvent()),
@@ -75,17 +76,33 @@ class _MyHomePageState extends State<MyHomePage> {
             alignment: Alignment.center,
             children: <Widget>[
               new StreamBuilder(
-                  stream: _bloc.bigBtnSize,
-                  initialData: Size(70,70),
+                  stream: _bloc.bigBtnSizeTween,
+                  //initialData: SizeTween(begin:Size(70,70),end: Size(100, 100)),
                   builder: (context,snapshot){
-                    return new CaptureButton(size: snapshot.data,color: Colors.yellow,);
+                    return new CaptureButton(defaultSize:Size(70,70),color: Colors.grey,sizeTween: snapshot.data,);
                   }),
               new StreamBuilder(
-                  stream: _bloc.smallBtnSize,
-                  initialData: Size(50,50),
+                  stream: _bloc.smallBtnSizeTween,
+                  //initialData: SizeTween(begin:Size(50,50),end: Size(40, 40)),
                   builder: (context,snapshot){
-                    return new CaptureButton(size: snapshot.data,color: Colors.black,);
+                    return new CaptureButton(defaultSize:Size(50,50),color: Colors.white,sizeTween: snapshot.data,);
                   }),
+              new StreamBuilder(
+                  stream: _bloc.showProgress,
+                  initialData: false,
+                  builder: (context,snapshot){
+                    //todo: stop animation when data is false
+                    if(snapshot.data){
+                      return new CircleProgressBar(
+                        foregroundColor: Colors.greenAccent,
+                        value: 1.0,
+                        duration: Duration(seconds: 10),
+                        container:new Container(),
+                      );
+                    }
+                    return new Container();
+
+                  })
             ],
           ),
         ),
