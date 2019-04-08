@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animation/circle_progress_bar.dart';
 import 'package:flutter_animation/long_press_bloc.dart';
 import 'capture_button.dart';
 import 'package:flutter_animation/long_press_event_counter.dart';
+import 'camera_example.dart';
 
 void main() => runApp(MyApp());
 
@@ -32,7 +34,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key key, this.title,this.videoPath}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -44,6 +46,8 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
+  String videoPath;
+  String defaultString = 'waiting for the path';
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -67,45 +71,21 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: GestureDetector(
-          onLongPress: ()=> _bloc.counterEventSink.add(LongPressStartEvent()),
-          onLongPressUp: ()=>_bloc.counterEventSink.add(LongPressEndEvent()),
-          child: new Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              new StreamBuilder(
-                  stream: _bloc.bigBtnSizeTween,
-                  //initialData: SizeTween(begin:Size(70,70),end: Size(100, 100)),
-                  builder: (context,snapshot){
-                    return new CaptureButton(defaultSize:Size(70,70),color: Colors.grey,sizeTween: snapshot.data,);
-                  }),
-              new StreamBuilder(
-                  stream: _bloc.smallBtnSizeTween,
-                  //initialData: SizeTween(begin:Size(50,50),end: Size(40, 40)),
-                  builder: (context,snapshot){
-                    return new CaptureButton(defaultSize:Size(50,50),color: Colors.white,sizeTween: snapshot.data,);
-                  }),
-              new StreamBuilder(
-                  stream: _bloc.showProgress,
-                  initialData: false,
-                  builder: (context,snapshot){
-                    //todo: stop animation when data is false
-                    if(snapshot.data){
-                      return new CircleProgressBar(
-                        foregroundColor: Colors.greenAccent,
-                        value: 1.0,
-                        duration: Duration(seconds: 10),
-                        container:new Container(),
-                      );
-                    }
-                    return new Container();
-
-                  })
-            ],
+      appBar: AppBar(
+        title: Text('camera example'),
+      ),
+      body: new Column(
+        children: <Widget>[
+          RaisedButton(
+            onPressed: ()async{
+              List<CameraDescription> cameras =await availableCameras();
+              Navigator.push(context, new MaterialPageRoute(builder: (context){return new CameraExampleHome(cameras);}));
+            },
           ),
-        ),
+          Text(
+            widget.videoPath?? widget.defaultString
+          ),
+        ],
       )
     );
   }

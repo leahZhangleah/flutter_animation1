@@ -9,6 +9,7 @@ class LongPressBloc{
   final _smallBtnStateController = StreamController<Tween<Size>>();
   final _showProgressController = StreamController<bool>();
   Timer totalTimer;
+  StreamSubscription streamSubscription;
 
   StreamSink<Tween<Size>> get _bigBtnSizeCounter => _bigBtnStateController.sink;
 
@@ -27,7 +28,7 @@ class LongPressBloc{
   StreamSink<CounterEvent> get counterEventSink => _counterEventController.sink;
 
   LongPressBloc(){
-    _counterEventController.stream.listen(_mapEventToState);
+     streamSubscription = _counterEventController.stream.listen(_mapEventToState);
   }
 
   void _mapEventToState(CounterEvent event) {
@@ -53,9 +54,11 @@ class LongPressBloc{
   }
 
   void dispose(){
+    streamSubscription.cancel();
     _counterEventController.close();
     _bigBtnStateController.close();
     _smallBtnStateController.close();
     _showProgressController.close();
+
   }
 }
