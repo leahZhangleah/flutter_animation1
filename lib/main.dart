@@ -7,6 +7,8 @@ import 'package:flutter_animation/long_press_bloc.dart';
 import 'capture_button.dart';
 import 'package:flutter_animation/long_press_event_counter.dart';
 import 'camera_example.dart';
+import 'package:flutter_animation/address/choose_address.dart';
+import 'coupon/coupon.dart';
 
 void main() => runApp(MyApp());
 
@@ -53,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
           RaisedButton(
             onPressed: ()async{
               List<CameraDescription> cameras =await availableCameras();
-              Navigator.push(context, new MaterialPageRoute(builder: (context){return new CameraExampleHome(cameras);}));
+              Navigator.push(context, new MaterialPageRoute(builder: (context){return new Coupon();}));
             },
           ),
           Text(
